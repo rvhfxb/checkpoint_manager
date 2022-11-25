@@ -7,12 +7,9 @@ from modules import script_callbacks, sd_models, shared
 from modules.ui import setup_progressbar, gr_show
 from modules.shared import opts, cmd_opts, state
 from webui import wrap_gradio_gpu_call
-
-
-import gradio as gr
 import html
 
-def create_ui():
+def on_ui_tabs():
     with gr.Blocks() as checkpoint_manager:
         with gr.Tabs() as tabs:
             with gr.TabItem("Chectpoint"):
@@ -51,8 +48,9 @@ def create_ui():
                     outputs=[],
                 )
 
-    return ui
+    return (checkpoint_manager, "Checkpoint Manager", "checkpoint_manager"),
 
+script_callbacks.on_ui_tabs(on_ui_tabs)
 
 def ckpt_table():
     filename =  os.path.join('extensions', 'checkpoint_manager', "json", 'data.json')
