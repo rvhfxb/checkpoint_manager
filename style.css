@@ -1,0 +1,21 @@
+#tab_checkpoint_manager table{
+    border-collapse: collapse;
+    width: 100%
+}
+
+#tab_checkpoint_manager table td, #tab_checkpoint_manager table th{
+    border: 1px solid #ccc;
+    padding: 0.25em 0.5em;
+}
+
+#tab_checkpoint_manager table input[type="text"]{
+    width:100%;
+}
+
+#tab_checkpoint_manager button{
+    max-width: 16em;
+}
+
+#tab_checkpoint_manager input[disabled="disabled"]{
+    opacity: 0.5;
+}

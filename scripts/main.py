@@ -59,29 +59,6 @@ def ckpt_table():
         data = json.load(f)
 
     code = f"""
-    <style>
-        #tab_checkpoint_manager table{{
-            border-collapse: collapse;
-            width: 100%
-        }}
-
-        #tab_checkpoint_manager table td, #tab_checkpoint_manager table th{{
-            border: 1px solid #ccc;
-            padding: 0.25em 0.5em;
-        }}
-
-        #tab_checkpoint_manager table input[type="text"]{{
-            width:100%;
-        }}
-
-        #tab_checkpoint_manager button{{
-            max-width: 16em;
-        }}
-
-        #tab_checkpoint_manager input[disabled="disabled"]{{
-            opacity: 0.5;
-        }}
-    </style>
     <table>
         <thead>
             <tr>
@@ -103,7 +80,7 @@ def ckpt_table():
         found = list(filter(lambda x: x["hash"]==c.hash,data))
         info = found[0] if len(found) > 0 else {"hash":"","comment":"","top":False}
         tr = f"""
-            <tr class="checkpoint_manager_row">
+            <tr class="checkpoint_manager_row" data-title="{c.title}">
                 <td width="50%">{os.path.splitext(os.path.basename(c.filename))[0]}</td>
                 <td class="checkpoint_manager_hash">{c.hash}</td>
                 <td><input class="checkpoint_manager_comment" type="text" value="{info["comment"]}"></td>
@@ -130,7 +107,8 @@ def ckpt_table():
 def load_checkpoint(title):
     opts.sd_model_checkpoint = title
     sd_models.reload_model_weights()
-    
+    # todo: update "Stable Diffusion checkpoint" dropdown
+
 def save_json(data):
     filename =  os.path.join('extensions', 'checkpoint_manager', "json", 'data.json')
     with open(filename, "w") as f:
