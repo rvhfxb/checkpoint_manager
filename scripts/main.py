@@ -43,7 +43,7 @@ def on_ui_tabs():
                 )
 
                 load_checkpoint_button.click(
-                    fn=modules.ui.wrap_gradio_call(load_checkpoint,extra_outputs=[]),
+                    fn=load_checkpoint,
                     inputs=[ckectpoint_to_load],
                     outputs=[],
                 )
@@ -130,13 +130,7 @@ def ckpt_table():
 def load_checkpoint(title):
     opts.sd_model_checkpoint = title
     sd_models.reload_model_weights()
-# fixme : ロードはできるがエラーが出る。左上のドロップダウンが変化しない
-
-# Traceback (most recent call last):
-#   File "E:\novelai\stable-diffusion-webui\modules\ui.py", line 185, in f
-#     res = list(func(*args, **kwargs))
-# TypeError: 'NoneType' object is not iterable
-
+    
 def save_json(data):
     filename =  os.path.join('extensions', 'checkpoint_manager', "json", 'data.json')
     with open(filename, "w") as f:
