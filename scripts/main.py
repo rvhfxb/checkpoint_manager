@@ -17,15 +17,16 @@ def on_ui_tabs():
                     reload_button = gr.Button(value="Reload")
                     save_button = gr.Button(value="Save")
                     sety_button = gr.Button(value="Set to Y Values")
-                    ckectpoint_to_load = gr.Text(elem_id="ckectpoint_to_load", visible=False)
-                    load_checkpoint_button = gr.Button(elem_id="load_checkpoint_button", visible=False)
+                    hide_checkbox = gr.Checkbox(label="Hide Checked Checkpoint", value=True, interactive=True)
+                    ckectpoint_to_load = gr.Text(elem_id="ckectpoint_to_load", visible=False).style(container=False)
+                    load_checkpoint_button = gr.Button(elem_id="load_checkpoint_button", visible=False).style(container=False)
                     json_data = gr.Text(elem_id="json_data", visible=False).style(container=False)
-                ckeckpoint_table = gr.HTML(lambda: ckpt_table())
+                checkpoint_table = gr.HTML(lambda: ckpt_table())
 
                 reload_button.click(
                     fn=ckpt_table,
-                    inputs=[],
-                    outputs=[ckeckpoint_table],
+                    inputs=[hide_checkbox],
+                    outputs=[checkpoint_table],
                 )
 
                 save_button.click(
@@ -48,11 +49,17 @@ def on_ui_tabs():
                     outputs=[],
                 )
 
+                hide_checkbox.change(
+                    fn=change_hide_checkbox,
+                    inputs=[hide_checkbox],
+                    outputs=[checkpoint_table]
+                )
+
     return (checkpoint_manager, "Checkpoint Manager", "checkpoint_manager"),
 
 script_callbacks.on_ui_tabs(on_ui_tabs)
 
-def ckpt_table():
+def ckpt_table(hide=True):
     filename =  os.path.join('extensions', 'checkpoint_manager', "json", 'data.json')
     data = []
     with open(filename) as f:
@@ -68,6 +75,7 @@ def ckpt_table():
                 <th>Action</th>
                 <th>Select</th>
                 <th>Top</th>
+                <th>Hide</th>
             </tr>
         </thead>
         <tbody>
@@ -78,15 +86,16 @@ def ckpt_table():
 
     for c in sd_models.checkpoints_list.values():
         found = list(filter(lambda x: x["hash"]==c.hash,data))
-        info = found[0] if len(found) > 0 else {"hash":"","comment":"","top":False}
+        info = found[0] if len(found) > 0 else {"hash":"","comment":"","top":False,"hide":False}
         tr = f"""
-            <tr class="checkpoint_manager_row" data-title="{c.title}">
+            <tr class="checkpoint_manager_row" data-title="{c.title}" {"style='visibility:collapse'" if hide and info.get("hide") else ""}>
                 <td width="50%">{os.path.splitext(os.path.basename(c.filename))[0]}</td>
                 <td class="checkpoint_manager_hash">{c.hash}</td>
                 <td><input class="checkpoint_manager_comment" type="text" value="{info["comment"]}"></td>
                 <td><input onclick="load_checkpoint(this, '{c.title}')" type="button" value="Load" class="gr-button gr-button-lg gr-button-secondary"></td>
                 <td><input class="checkpoint_manager_select" type="checkbox"></td>
-                <td><input class="checkpoint_manager_top" type="checkbox" {"checked" if info["top"] else ""}></td>
+                <td><input class="checkpoint_manager_top" type="checkbox" {"checked" if info.get("top") else ""}></td>
+                <td><input class="checkpoint_manager_hide" type="checkbox" {"checked" if info.get("hide") else ""}></td>
             </tr>
             """
         if info["top"]:
@@ -101,6 +110,7 @@ def ckpt_table():
         </tbody>
     </table>
     """
+    gr.update()
 
     return code
 
@@ -116,3 +126,11 @@ def save_json(data):
 
 def set_y_values():
     pass
+
+def change_hide_checkbox(hide):
+    return ckpt_table(hide)
+    # todo: hide from "Stable Diffusion checkpoint" dropdown
+    # hide
+    # del sd_models.checkpoints_list[title]
+    # show
+    # sd_models.list_models()
